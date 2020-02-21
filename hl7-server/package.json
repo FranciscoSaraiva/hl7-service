@@ -2,10 +2,10 @@
   "name": "hl7-client",
   "version": "1.0.0",
   "description": "server for hl7 service",
-  "main": "app.js",
+  "main": "hl7-server.js",
   "scripts": {
-    "dev": "tsc && node dist/esstrade.js",
-    "start": "npm run build && node ./build/esstrade.js",
+    "dev": "tsc && node dist/hl7-server.js",
+    "start": "npm run build && node ./build/hl7-server.js",
     "build": "tsc"
   },
   "author": "",
