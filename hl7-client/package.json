@@ -4,7 +4,9 @@
   "description": "client for hl7 service",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsc && node dist/esstrade.js",
+    "start": "npm run build && node ./build/esstrade.js",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC"
