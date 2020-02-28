@@ -1,5 +1,5 @@
 //import
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, RelationId } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn } from 'typeorm';
 //class
 import { Doente } from './doente';
 import { Consulta } from './consulta';
@@ -13,12 +13,15 @@ export class Pedido extends BaseEntity {
     @Column({ name: 'data_hora', type: 'datetime' })
     data_hora: Date;
 
-    @RelationId((pedido: Pedido) => pedido.consulta)
+    @OneToOne(type => Consulta, { eager: true })
+    @JoinColumn()
     consulta: Consulta;
 
-    @RelationId((pedido: Pedido) => pedido.doente)
+    @OneToOne(type => Consulta, { eager: true })
+    @JoinColumn()
     doente: Doente;
 
-    @RelationId((pedido: Pedido) => pedido.ato_medico)
+    @OneToOne(type => Consulta, { eager: true })
+    @JoinColumn()
     ato_medico: AtoMedico;
 }

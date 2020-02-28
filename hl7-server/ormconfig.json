@@ -6,6 +6,7 @@
     "password": "password",
     "database": "hl7-server",
     "synchronize": true,
+    "dropSchema": true,
     "logging": false,
     "entities": [
         "build/models/*.js"
