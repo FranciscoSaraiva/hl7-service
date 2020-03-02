@@ -4,15 +4,15 @@ import { Entity, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
 @Entity('Consulta')
 export class Consulta extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'identificador' })
-    private identificador: Number;
+    private identificador: number;
 
     //Get
-    public GetIdentificador(): Number {
+    public GetIdentificador(): number {
         return this.identificador;
     }
 
     //Set
-    public SetIdentificador(identificador: Number): void {
+    public SetIdentificador(identificador: number): void {
         this.identificador = identificador;
     }
 

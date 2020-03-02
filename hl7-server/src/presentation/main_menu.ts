@@ -3,7 +3,7 @@ import clear from 'clear';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 //local
-import { VerPedidosView } from './pedidos';
+import { VerPedidosView, CriarPedidoView } from './pedidos';
 
 const registar_pedido = chalk.blueBright('Registar Pedidos');
 const ver_pedidos = chalk.blueBright('Ver Pedidos');
@@ -21,7 +21,7 @@ export function MainMenuView(): void {
         .then(answers => {
             switch (answers.option) {
                 case registar_pedido:
-                    console.log('registar pedido')
+                    CriarPedidoView();
                     break;
                 case ver_pedidos:
                     VerPedidosView();

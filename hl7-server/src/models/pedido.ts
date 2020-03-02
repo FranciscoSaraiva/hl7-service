@@ -1,5 +1,5 @@
 //import
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn, ManyToOne, JoinTable } from 'typeorm';
 //class
 import { Doente } from './doente';
 import { Consulta } from './consulta';
@@ -8,33 +8,34 @@ import { AtoMedico } from './ato_medico';
 @Entity('Pedido')
 export class Pedido extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'numero_pedido' })
-    private numero_pedido: Number;
+    private numero_pedido: number;
 
     @Column({ name: 'data_hora', type: 'datetime' })
     private data_hora: Date;
 
-    @OneToOne(type => Consulta, { eager: true })
-    @JoinColumn()
+    @ManyToOne(type => Consulta, { eager: true, cascade: true })
+    @JoinTable()
     private consulta: Consulta;
 
-    @OneToOne(type => Consulta, { eager: true })
-    @JoinColumn()
+    @ManyToOne(type => Consulta, { eager: true, cascade: true })
+    @JoinTable()
     private doente: Doente;
 
-    @OneToOne(type => Consulta, { eager: true })
-    @JoinColumn()
+    @ManyToOne(type => Consulta, { eager: true, cascade: true })
+    @JoinTable()
     private ato_medico: AtoMedico;
 
 
     constructor(consulta: Consulta, doente: Doente, ato_medico: AtoMedico) {
         super();
+        this.data_hora = new Date();
         this.consulta = consulta;
         this.doente = doente;
         this.ato_medico = ato_medico;
     }
 
     //Gets
-    public GetNumero_Pedido(): Number {
+    public GetNumero_Pedido(): number {
         return this.numero_pedido;
     }
 
@@ -55,7 +56,7 @@ export class Pedido extends BaseEntity {
     }
 
     //Sets
-    public SetNumero_Pedido(numero_pedido: Number): void {
+    public SetNumero_Pedido(numero_pedido: number): void {
         this.numero_pedido = numero_pedido;
     }
 

@@ -5,42 +5,42 @@ import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColum
 export class Worklist extends BaseEntity {
 
     @PrimaryGeneratedColumn({ name: 'numero_pedido' })
-    private id: Number;
+    private id: number;
 
     @Column({ name: 'pedido_id', type: 'int' })
-    private pedido_id: Number;
+    private pedido_id: number;
 
     @Column({ name: 'estado', type: 'varchar' })
-    private estado: String;
+    private estado: string;
 
-    constructor(pedido_id: Number) {
+    constructor(pedido_id: number) {
         super();
         this.pedido_id = pedido_id;
     }
 
     //Gets
-    public GetId(): Number {
+    public GetId(): number {
         return this.id;
     }
 
-    public GetPedido_id(): Number {
+    public GetPedido_id(): number {
         return this.pedido_id;
     }
 
-    public GetEstado(): String {
+    public GetEstado(): string {
         return this.estado;
     }
 
     //Sets
-    public SetId(id: Number): void {
+    public SetId(id: number): void {
         this.id = id;
     }
 
-    public SetPedido_id(pedido_id: Number): void {
+    public SetPedido_id(pedido_id: number): void {
         this.pedido_id = pedido_id;
     }
 
-    public SetEstado(estado: String): void {
+    public SetEstado(estado: string): void {
         this.estado = estado;
     }
 }

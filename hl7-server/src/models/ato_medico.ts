@@ -4,30 +4,36 @@ import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
 @Entity('AtoMedico')
 export class AtoMedico extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'identificador' })
-    private id: Number;
+    private id: number;
 
     @Column({ name: 'ato' })
-    private ato: String;
+    private ato: string;
 
-    constructor(ato: String) {
+    constructor(ato: string) {
         super();
         this.ato = ato;
     }
 
     //Gets
-    public GetId(): Number {
+    public GetId(): number {
         return this.id;
     }
 
-    public GetAto(): String {
+    public GetAto(): string {
         return this.ato;
     }
     //Sets
-    public SetId(id: Number): void {
+    public SetId(id: number): void {
         this.id = id;
     }
 
-    public SetAto(ato: String): void {
+    public SetAto(ato: string): void {
         this.ato = ato;
+    }
+
+    static findByAto(ato: string) {
+        return this.createQueryBuilder('atomedico')
+            .where('atomedico.ato = :ato', { ato })
+            .getOne();
     }
 }
