@@ -38,6 +38,10 @@ export class Pedido extends BaseEntity {
         return this.numero_pedido;
     }
 
+    public GetData_hora(): Date {
+        return this.data_hora;
+    }
+
     public GetConsulta(): Consulta {
         return this.consulta;
     }
@@ -53,6 +57,10 @@ export class Pedido extends BaseEntity {
     //Sets
     public SetNumero_Pedido(numero_pedido: Number): void {
         this.numero_pedido = numero_pedido;
+    }
+
+    public SetData_hora(data_hora: Date): void {
+        this.data_hora = data_hora;
     }
 
     public SetConsulta(consulta: Consulta): void {
