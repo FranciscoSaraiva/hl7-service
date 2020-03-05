@@ -1,35 +1,67 @@
 var hl7 = require('simple-hl7');
-
-///////////////////SERVER/////////////////////
+var typeorm = require('typeorm');
 var app = hl7.tcp();
 
-app.use(function (req, res, next) {
-    //req.msg is the HL7 message
-    console.log('******message received*****')
-    console.log(req.msg.log());
-    next();
+typeorm.createConnection({
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "password",
+    "database": "desk-medic",
+    "entities": [
+        "./build/models/*.js",
+    ]
 })
+    .then(connection => {
+        console.log('connected')
+        console.log(connection.getDatabaseName())
 
-app.use(function (req, res, next) {
-    //res.ack is the ACK
-    //acks are created automatically
+        app.use((req, res, next) => {
+            console.log('******message received*****')
 
-    //send the res.ack back
-    console.log('******sending ack*****')
-    res.end()
-})
+            console.log(req.msg.log() + '\n');
 
-app.use(function (err, req, res, next) {
-    //error handler
-    //standard error middleware would be
-    console.log('******ERROR*****')
-    console.log(err);
-    var msa = res.ack.getSegment('MSA');
-    msa.setField(1, 'AR');
-    res.ack.addSegment('ERR', err.message);
-    res.end();
-});
+            var numero_pedido = req.msg.getSegment('PID').getField(1);
+            var numero_consulta = req.msg.getSegment('PID').getField(2);
+            criarPedido(numero_pedido, numero_consulta, connection);
 
-//Listen on port 7777
-app.start(7711);
-///////////////////SERVER/////////////////////
+            next();
+        })
+
+        app.use((req, res, next) => {
+            console.log('******sending ack*****')
+            res.end();
+        })
+
+        app.use(function (err, req, res, next) {
+            //error handler
+            //standard error middleware would be
+            console.log('******ERROR*****')
+            console.log(err);
+            res.ack.addSegment('ERR', err.message);
+            res.end();
+        });
+
+        app.start(7701);
+    })
+    .catch(err => { console.log(err) })
+
+
+async function criarPedido(numero_pedido, numero_consulta, connection) {
+    console.log(numero_consulta)
+    await connection
+        .createQueryBuilder()
+        .insert()
+        .into('Consulta')
+        .values([{ identificador: numero_consulta, relatorio: '' }])
+        .execute();
+
+    await connection
+        .createQueryBuilder()
+        .insert()
+        .into('Pedido')
+        .values([{ numero_pedido: numero_pedido, consulta: { identificador: numero_consulta }, estado: false, data_hora: new Date() }])
+        .execute();
+
+}

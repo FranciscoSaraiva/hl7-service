@@ -61,7 +61,6 @@ typeorm.createConnection({
         setInterval(() => {
             runClient();
         }, 8000);
-        runClient();
     })
     .catch(err => { console.log(err) })
 
@@ -74,7 +73,7 @@ function criarMensagemRealizacaoExame(work) {
     //ORC (que tipo de mensagem)
     message.addSegment('ORC', 'EXAME')
     //OBR (estado do pedido)
-    message.addSegment('OBR', work.estado_pedido)
+    message.addSegment('OBR', (work.estado_pedido) ? 1 : 0)
 
     return message;
 }

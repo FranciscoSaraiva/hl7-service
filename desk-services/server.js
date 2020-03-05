@@ -79,6 +79,6 @@ async function atualizarRelatorio(numero_consulta, relatorio, connection) {
         .createQueryBuilder()
         .update('Consulta')
         .set({ relatorio: relatorio })
-        .where("numero_consulta = :id", { id: numero_consulta })
+        .where("identificador = :id", { id: numero_consulta })
         .execute();
 }

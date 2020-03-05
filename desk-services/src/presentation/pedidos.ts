@@ -78,11 +78,13 @@ export function VerPedidosView(): void {
                 let data_hora: Date = pedido.GetData_hora();
                 let data_hora_formatted: string = `${data_hora.getDate()}-${data_hora.getMonth() + 1}-${data_hora.getFullYear()} ${data_hora.getHours()}:${data_hora.getMinutes()}`;
 
-                pedidosRow.push([num_pedido, data_hora_formatted, consulta, doente_proc, ato_medico_ato]);
+                let estado = (pedido.GetEstado()) ? 'Realizado' : 'Não Realizado';
+
+                pedidosRow.push([num_pedido, data_hora_formatted, consulta, doente_proc, ato_medico_ato, estado]);
             }
 
             var table = CreateTable(
-                ['Nº Pedido', 'Data e Hora', 'Consulta', 'Doente', 'Ato Médico'],
+                ['Nº Pedido', 'Data e Hora', 'Consulta', 'Doente', 'Ato Médico', 'Estado'],
                 pedidosRow);
             console.log(table.toString());
             MainMenuView();
