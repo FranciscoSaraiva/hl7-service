@@ -7,3 +7,4 @@ Colocar servidor e cliente a comunicar usando hl7 para trocar mensagens.
 
 #### Anexos
 - [Ficha 1](./anexos/FE01.pdf)
+- [Exemplos HL7](./anexos/hl7msg.pdf)
