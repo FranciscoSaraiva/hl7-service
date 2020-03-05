@@ -28,6 +28,7 @@ export function MainMenuView(): void {
                     RealizarExameView();
                     break;
                 case emitir_relatorio:
+                    EmitirRelatorioView();
                     break;
                 case sair:
                     process.exit(0);
