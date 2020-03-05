@@ -6,6 +6,7 @@ import clear from 'clear';
 import { ConnectingDatabaseView, ConnectedDatabaseView, SeedingDatabaseView } from './presentation/database';
 import { MainMenuView } from './presentation/main_menu';
 import { Logo } from './presentation/application';
+import { SeedDatabase } from './database/seed';
 
 clear();
 ConnectingDatabaseView();
@@ -13,6 +14,7 @@ createConnection().then(async connection => {
     clear();
     console.log(connection);
     ConnectedDatabaseView();
+    await SeedDatabase();
     clear();
     Logo();
     MainMenuView();

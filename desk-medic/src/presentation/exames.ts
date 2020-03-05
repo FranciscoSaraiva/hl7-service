@@ -6,6 +6,7 @@ import inquirer from 'inquirer';
 //local
 import { Pedido } from '../models/pedido';
 import { MainMenuView } from './main_menu';
+import { Worklist } from '../models/worklist';
 
 export function RealizarExameView(): void {
     clear();
@@ -33,8 +34,12 @@ export function RealizarExameView(): void {
                 pedido.SetEstado(true);
                 await pedido.save();
 
+                var worklist = new Worklist(pedido.GetNumero_Pedido(), pedido.GetConsulta().GetIdentificador());
+                worklist.SetEstado_pedido(true);
+                await worklist.save();
+
                 clear();
-                console.log(chalk.redBright(`Exame realizado ao pedido ${pedido.GetNumero_Pedido()}\n`));
+                console.log(chalk.greenBright(`Exame realizado ao pedido ${pedido.GetNumero_Pedido()}\n`));
                 MainMenuView();
             })
         })

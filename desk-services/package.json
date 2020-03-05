@@ -1,11 +1,11 @@
 {
-  "name": "hl7-client",
+  "name": "desk-services",
   "version": "1.0.0",
-  "description": "server for hl7 service",
-  "main": "hl7-server.js",
+  "description": "desk-services frontend",
+  "main": "desk-services.js",
   "scripts": {
-    "dev": "tsc && node dist/hl7-server.js",
-    "start": "npm run build && node ./build/hl7-server.js",
+    "dev": "tsc && node dist/desk-services.js",
+    "start": "npm run build && node ./build/desk-services.js",
     "build": "tsc"
   },
   "author": "",

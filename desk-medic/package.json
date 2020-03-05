@@ -1,11 +1,11 @@
 {
-  "name": "hl7-client",
+  "name": "desk-medic",
   "version": "1.0.0",
-  "description": "client for hl7 service",
-  "main": "hl7-client.js",
+  "description": "desk-medic frontend",
+  "main": "desk-medic.js",
   "scripts": {
-    "dev": "tsc && node dist/hl7-client.js",
-    "start": "npm run build && node ./build/hl7-client.js",
+    "dev": "tsc && node dist/desk-medic.js",
+    "start": "npm run build && node ./build/desk-medic.js",
     "build": "tsc"
   },
   "author": "",

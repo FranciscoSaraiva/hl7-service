@@ -10,6 +10,7 @@ import { MainMenuView } from './main_menu';
 import { Doente } from '../models/doente';
 import { AtoMedico } from '../models/ato_medico';
 import { Consulta } from '../models/consulta';
+import { Worklist } from '../models/worklist';
 
 
 export async function CriarPedidoView(): Promise<void> {
@@ -42,6 +43,8 @@ export async function CriarPedidoView(): Promise<void> {
         var pedido = new Pedido(consulta, doente, ato_medico);
 
         await pedido.save();
+        var worklist: Worklist = new Worklist(pedido.GetNumero_Pedido(), pedido.GetConsulta().GetIdentificador());
+        await worklist.save();
 
         clear();
         MainMenuView();

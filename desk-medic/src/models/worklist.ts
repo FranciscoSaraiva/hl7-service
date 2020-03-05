@@ -24,6 +24,7 @@ export class Worklist extends BaseEntity {
         this.numero_pedido = numero_pedido;
         this.numero_consulta = numero_consulta;
         this.estado_pedido = false;
+        this.relatorio = '';
     }
 
     //Gets

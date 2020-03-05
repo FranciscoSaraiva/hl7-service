@@ -5,6 +5,7 @@ import inquirer from 'inquirer';
 //local
 import { VerEstadoPedidosView } from './pedidos';
 import { RealizarExameView } from './exames';
+import { EmitirRelatorioView } from './relatorios';
 
 const ver_estado_pedidos = chalk.blueBright('Ver estado de pedidos');
 const realizar_exame = chalk.blueBright('Realizar exame');

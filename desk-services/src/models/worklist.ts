@@ -13,9 +13,10 @@ export class Worklist extends BaseEntity {
     @Column({ name: 'numero_consulta', type: 'int' })
     private numero_consulta: number;
 
-    constructor(pedido_id: number) {
+    constructor(numero_pedido: number, numero_consulta: number) {
         super();
-        this.numero_pedido = pedido_id;
+        this.numero_pedido = numero_pedido;
+        this.numero_consulta = numero_consulta;
     }
 
     //Gets
