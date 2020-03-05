@@ -1,13 +1,11 @@
 //import
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn, ManyToOne, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn, ManyToOne, JoinTable, PrimaryColumn } from 'typeorm';
 //class
-import { Doente } from './doente';
 import { Consulta } from './consulta';
-import { AtoMedico } from './ato_medico';
 
 @Entity('Pedido')
 export class Pedido extends BaseEntity {
-    @PrimaryGeneratedColumn({ name: 'numero_pedido' })
+    @PrimaryColumn({ name: 'numero_pedido', type: 'int' })
     private numero_pedido: number;
 
     @Column({ name: 'data_hora', type: 'datetime' })
@@ -17,23 +15,14 @@ export class Pedido extends BaseEntity {
     @JoinTable()
     private consulta: Consulta;
 
-    @ManyToOne(type => Consulta, { eager: true, cascade: true })
-    @JoinTable()
-    private doente: Doente;
-
-    @ManyToOne(type => Consulta, { eager: true, cascade: true })
-    @JoinTable()
-    private ato_medico: AtoMedico;
-
     @Column({ name: 'estado', type: 'boolean' })
     private estado: boolean;
 
-    constructor(consulta: Consulta, doente: Doente, ato_medico: AtoMedico) {
+    constructor(numero_pedido: number, consulta: Consulta) {
         super();
+        this.numero_pedido = numero_pedido;
         this.data_hora = new Date();
         this.consulta = consulta;
-        this.doente = doente;
-        this.ato_medico = ato_medico;
         this.estado = false;
     }
 
@@ -48,14 +37,6 @@ export class Pedido extends BaseEntity {
 
     public GetConsulta(): Consulta {
         return this.consulta;
-    }
-
-    public GetDoente(): Doente {
-        return this.doente;
-    }
-
-    public GetAto_Medico(): AtoMedico {
-        return this.ato_medico;
     }
 
     public GetEstado(): boolean {
@@ -73,14 +54,6 @@ export class Pedido extends BaseEntity {
 
     public SetConsulta(consulta: Consulta): void {
         this.consulta = consulta;
-    }
-
-    public SetDoente(doente: Doente): void {
-        this.doente = doente;
-    }
-
-    public SetAto_Medico(ato_medico: AtoMedico): void {
-        this.ato_medico = ato_medico;
     }
 
     public SetEstado(estado: boolean): void {

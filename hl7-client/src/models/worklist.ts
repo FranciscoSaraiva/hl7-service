@@ -13,9 +13,17 @@ export class Worklist extends BaseEntity {
     @Column({ name: 'numero_consulta', type: 'int' })
     private numero_consulta: number;
 
-    constructor(pedido_id: number) {
+    @Column({ name: 'estado_pedido', type: 'boolean' })
+    private estado_pedido: boolean;
+
+    @Column({ name: 'relatorio', type: 'varchar' })
+    private relatorio: string;
+
+    constructor(numero_pedido: number, numero_consulta: number) {
         super();
-        this.numero_pedido = pedido_id;
+        this.numero_pedido = numero_pedido;
+        this.numero_consulta = numero_consulta;
+        this.estado_pedido = false;
     }
 
     //Gets
@@ -31,6 +39,14 @@ export class Worklist extends BaseEntity {
         return this.numero_consulta;
     }
 
+    public GetEstado_pedido(): boolean {
+        return this.estado_pedido;
+    }
+
+    public GetRelatorio(): string {
+        return this.relatorio;
+    }
+
     //Sets
     public SetId(id: number): void {
         this.id = id;
@@ -44,4 +60,11 @@ export class Worklist extends BaseEntity {
         this.numero_consulta = numero_consulta;
     }
 
+    public SetEstado_pedido(estado_pedido: boolean): void {
+        this.estado_pedido = estado_pedido;
+    }
+
+    public SetRelatorio(relatorio: string): void {
+        this.relatorio = relatorio;
+    }
 }

@@ -3,7 +3,8 @@ import clear from 'clear';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 //local
-
+import { VerEstadoPedidosView } from './pedidos';
+import { RealizarExameView } from './exames';
 
 const ver_estado_pedidos = chalk.blueBright('Ver estado de pedidos');
 const realizar_exame = chalk.blueBright('Realizar exame');
@@ -21,8 +22,10 @@ export function MainMenuView(): void {
         .then(answers => {
             switch (answers.option) {
                 case ver_estado_pedidos:
+                    VerEstadoPedidosView();
                     break;
                 case realizar_exame:
+                    RealizarExameView();
                     break;
                 case emitir_relatorio:
                     break;

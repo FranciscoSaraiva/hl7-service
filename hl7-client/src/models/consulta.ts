@@ -1,16 +1,18 @@
 //import
-import { Entity, PrimaryGeneratedColumn, BaseEntity, Column } from 'typeorm';
+import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('Consulta')
 export class Consulta extends BaseEntity {
-    @PrimaryGeneratedColumn({ name: 'identificador' })
+
+    @PrimaryColumn({ name: 'identificador', type: 'int' })
     private identificador: number;
 
     @Column({ name: 'relatorio', type: 'varchar' })
     private relatorio: string;
 
-    constructor() {
+    constructor(identificador: number) {
         super();
+        this.identificador = identificador;
         this.relatorio = '';
     }
 
