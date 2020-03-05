@@ -39,8 +39,6 @@ export async function CriarPedidoView(): Promise<void> {
         var doente: Doente = await Doente.findByNumeroProcesso(doente_answer);
         var ato_medico: AtoMedico = await AtoMedico.findByAto(ato_medico_answer);
 
-        console.log(doente);
-        console.log(ato_medico);
         var pedido = new Pedido(consulta, doente, ato_medico);
 
         await pedido.save();
@@ -53,7 +51,7 @@ export async function CriarPedidoView(): Promise<void> {
 export function VerPedidosView(): void {
     clear();
     getRepository(Pedido).find()
-        .then((pedidos: Pedido[]) => {
+        .then(async (pedidos: Pedido[]) => {
 
             if (pedidos.length == 0) {
                 console.log(chalk.redBright('Não existem pedidos...'));
@@ -61,23 +59,28 @@ export function VerPedidosView(): void {
                 return;
             }
 
-            var pedidosRow: any[];
-            console.log(pedidos)
-            
-            process.exit(0);
-            pedidos.forEach((pedido: Pedido) => {
-                let num_pedido = pedido.GetNumero_Pedido();
-                let data_hora = pedido.GetData_hora();
-                let consulta = pedido.GetConsulta().GetIdentificador();
-                let doente = pedido.GetDoente().GetNumero_processo();
-                let ato_medico = pedido.GetAto_Medico().GetAto();
+            var pedidosRow: any[] = [];
 
-                pedidosRow.push([num_pedido, data_hora, consulta, doente, ato_medico]);
-            })
+            for (let index = 0; index < pedidos.length; index++) {
+                const pedido: Pedido = pedidos[index];
+                let consulta: number = pedido.GetConsulta().GetIdentificador();
+
+                let doente: Doente = await getRepository(Doente).findOne({ where: { identificador: pedido.GetDoente().GetIdentificador() } });
+                let doente_proc = doente.GetNumero_processo();
+
+                let ato_medico: AtoMedico = await getRepository(AtoMedico).findOne({ where: { identificador: pedido.GetAto_Medico().GetIdentificador() } });
+                let ato_medico_ato: string = ato_medico.GetAto();
+
+                let num_pedido: number = pedido.GetNumero_Pedido();
+                let data_hora: Date = pedido.GetData_hora();
+                let data_hora_formatted: string = `${data_hora.getDate()}-${data_hora.getMonth() + 1}-${data_hora.getFullYear()} ${data_hora.getHours()}:${data_hora.getMinutes()}`;
+
+                pedidosRow.push([num_pedido, data_hora_formatted, consulta, doente_proc, ato_medico_ato]);
+            }
 
             var table = CreateTable(
                 ['Nº Pedido', 'Data e Hora', 'Consulta', 'Doente', 'Ato Médico'],
-                pedidos);
+                pedidosRow);
             console.log(table.toString());
             MainMenuView();
         })

@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 //local
 import { VerPedidosView, CriarPedidoView } from './pedidos';
+import { VerRelatorios } from './relatorios';
 
 const registar_pedido = chalk.blueBright('Registar Pedidos');
 const ver_pedidos = chalk.blueBright('Ver Pedidos');
@@ -27,7 +28,7 @@ export function MainMenuView(): void {
                     VerPedidosView();
                     break;
                 case ver_relatorios:
-                    console.log('ver relatorios')
+                    VerRelatorios();
                     break;
                 case sair:
                     process.exit(0);

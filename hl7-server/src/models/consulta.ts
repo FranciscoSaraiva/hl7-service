@@ -1,14 +1,26 @@
 //import
-import { Entity, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, BaseEntity, Column } from 'typeorm';
 
 @Entity('Consulta')
 export class Consulta extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'identificador' })
     private identificador: number;
 
+    @Column({ name: 'relatorio' })
+    private relatorio: string;
+
+    constructor() {
+        super();
+        this.relatorio = '';
+    }
+
     //Get
     public GetIdentificador(): number {
         return this.identificador;
+    }
+
+    public GetRelatorio(): string {
+        return this.relatorio;
     }
 
     //Set
@@ -16,4 +28,7 @@ export class Consulta extends BaseEntity {
         this.identificador = identificador;
     }
 
+    public SetRelatorio(relatorio: string): void {
+        this.relatorio = relatorio;
+    }
 }

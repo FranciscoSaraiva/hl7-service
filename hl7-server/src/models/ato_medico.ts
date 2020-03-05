@@ -4,7 +4,7 @@ import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
 @Entity('AtoMedico')
 export class AtoMedico extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'identificador' })
-    private id: number;
+    private identificador: number;
 
     @Column({ name: 'ato' })
     private ato: string;
@@ -15,16 +15,16 @@ export class AtoMedico extends BaseEntity {
     }
 
     //Gets
-    public GetId(): number {
-        return this.id;
+    public GetIdentificador(): number {
+        return this.identificador;
     }
 
     public GetAto(): string {
         return this.ato;
     }
     //Sets
-    public SetId(id: number): void {
-        this.id = id;
+    public SetId(identificador: number): void {
+        this.identificador = identificador;
     }
 
     public SetAto(ato: string): void {

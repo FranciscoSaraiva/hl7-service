@@ -8,6 +8,7 @@ import { MainMenuView } from './presentation/main_menu';
 import { SeedDatabase } from './database/seed';
 import { Logo } from './presentation/application';
 
+clear();
 ConnectingDatabaseView();
 createConnection().then(async connection => {
     clear();
@@ -15,7 +16,9 @@ createConnection().then(async connection => {
     ConnectedDatabaseView();
     SeedingDatabaseView();
     await SeedDatabase();
+    clear();
     Logo();
+    process.setMaxListeners(0);
     MainMenuView();
 }).catch(error => {
     console.log('An error occured creating the connection...');
