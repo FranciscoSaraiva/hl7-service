@@ -18,7 +18,6 @@ createConnection().then(async connection => {
     await SeedDatabase();
     clear();
     Logo();
-    process.setMaxListeners(0);
     MainMenuView();
 }).catch(error => {
     console.log('An error occured creating the connection...');
