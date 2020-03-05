@@ -4,7 +4,7 @@
     "port": 3306,
     "username": "root",
     "password": "password",
-    "database": "hl7-client",
+    "database": "desk-medic",
     "synchronize": true,
     "dropSchema": true,
     "logging": false,
