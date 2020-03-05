@@ -7,7 +7,7 @@ export function Logo(): void {
     console.log(
         boxen(
             chalk.blueBright(
-                figlet.textSync('HL7 Client', { horizontalLayout: 'full' })
+                figlet.textSync('Desk Medic', { horizontalLayout: 'full' })
             ),
             { padding: 1, borderColor: 'magentaBright', borderStyle: BorderStyle.Double })
     );
