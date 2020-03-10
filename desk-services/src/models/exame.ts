@@ -18,7 +18,7 @@ export class Exame extends BaseEntity {
 
     constructor(descricao: string, tipo_exame: TipoExame) {
         super();
-        this.descricao = this.descricao;
+        this.descricao = descricao;
         this.relatorio = '';
         this.tipo_exame = tipo_exame;
     }

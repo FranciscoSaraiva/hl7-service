@@ -7,6 +7,7 @@ import { ConnectingDatabaseView, ConnectedDatabaseView, SeedingDatabaseView } fr
 import { MainMenuView } from './presentation/main_menu';
 import { SeedDatabase } from './database/seed';
 import { Logo } from './presentation/application';
+import chalk from 'chalk';
 
 clear();
 ConnectingDatabaseView();
@@ -15,7 +16,8 @@ createConnection().then(async connection => {
     console.log(connection);
     ConnectedDatabaseView();
     SeedingDatabaseView();
-    await SeedDatabase();
+    await SeedDatabase()
+        .catch(err => { console.log(chalk.redBright('An error occured seeding the database...')); console.log(err) });
     clear();
     Logo();
     MainMenuView();

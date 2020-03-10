@@ -3,7 +3,12 @@ import { Doente } from '../models/doente';
 
 export async function createDoente(num_utente: string, nome: string, telefone: string): Promise<Doente> {
     let doente: Doente = new Doente(num_utente, nome, telefone);
-    await doente.save();
+    await doente.save().catch(err => { console.log(err) });
+    return doente;
+}
+
+export async function getDoentes(): Promise<Doente[]> {
+    let doente: Doente[] = await getRepository(Doente).find();
     return doente;
 }
 

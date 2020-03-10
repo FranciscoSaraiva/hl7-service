@@ -10,21 +10,23 @@ import { MainMenuView } from './main_menu';
 import { Doente } from '../models/doente';
 import { Worklist } from '../models/worklist';
 import { TipoExame } from '../models/tipo_exame';
-import { getDoente } from '../application/doentes';
-import { getTipoExame } from '../application/tipo_exames';
+import { getDoente, getDoentes } from '../application/doentes';
+import { getTipoExame, getTipoExames } from '../application/tipo_exames';
 import { createExame } from '../application/exames';
 import { Exame } from '../models/exame';
 
 
 export async function CriarPedidoView(): Promise<void> {
     clear();
-    var doentes = await getRepository(Doente).find();
+    var doentes: Doente[] = await getDoentes();
     let doentesList: string[] = [];
     doentes.forEach((doente: Doente) => {
-        doentesList.push(doente.getNum_utente + ' - ' + doente.getNome().toString());
+        let num_utente: string = doente.getNum_utente();
+        let nome: string = doente.getNome();
+        doentesList.push(`${num_utente} - ${nome}`);
     });
 
-    var tipos_exames = await getRepository(TipoExame).find();
+    var tipos_exames = await getTipoExames();
     let tipos_examesList: string[] = [];
     tipos_exames.forEach((tipo: TipoExame) => {
         tipos_examesList.push(tipo.getDescricao());
@@ -34,25 +36,25 @@ export async function CriarPedidoView(): Promise<void> {
         { type: 'list', name: 'doente', message: 'Qual o doente?', choices: doentesList },
         { type: 'list', name: 'tipo_exame', message: 'Qual o tipo de exame?', choices: tipos_examesList },
         { type: 'input', name: 'descricao', message: 'Descreva o exame: ', choices: tipos_examesList }
-    ]).then(async answer => {
-        let doente_answer: string = answer.doente;
-        let tipo_exame_answer: string = answer.tipo_exame;
-        let descricao_answer: string = answer.descricao;
+    ])
+        .then(async answer => {
+            let doente_answer: string = answer.doente;
+            let tipo_exame_answer: string = answer.tipo_exame;
+            let descricao_answer: string = answer.descricao;
 
-        var doente: Doente = await getDoente(doente_answer);
-        var tipo_exame: TipoExame = await getTipoExame(tipo_exame_answer);
+            var doente: Doente = await getDoente(doente_answer);
+            var tipo_exame: TipoExame = await getTipoExame(tipo_exame_answer);
+            var exame: Exame = await createExame(descricao_answer, tipo_exame)
+            var pedido = new Pedido(exame, doente);
+            await pedido.save();
 
-        var exame: Exame = await createExame(descricao_answer, tipo_exame)
+            var worklist: Worklist = new Worklist(pedido);
+            await worklist.save();
 
-        var pedido = new Pedido(exame, doente);
-
-        await pedido.save();
-        var worklist: Worklist = new Worklist(pedido);
-        await worklist.save();
-
-        clear();
-        MainMenuView();
-    })
+            clear();
+            MainMenuView();
+        })
+        .catch(err => { console.log(err) })
 }
 
 export function VerPedidosView(): void {

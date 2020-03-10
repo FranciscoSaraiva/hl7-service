@@ -4,7 +4,7 @@ import { TipoExame } from '../models/tipo_exame';
 
 export async function createExame(descricao: string, tipo_exame: TipoExame): Promise<Exame> {
     let exame: Exame = new Exame(descricao, tipo_exame);
-    await exame.save();
+    await exame.save().catch(err => { console.log(err) });
     return exame;
 }
 

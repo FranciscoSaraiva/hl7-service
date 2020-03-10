@@ -38,4 +38,5 @@ export function MainMenuView(): void {
                     break;
             }
         })
+        .catch(err => { console.log(err) })
 }

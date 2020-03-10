@@ -5,7 +5,7 @@ import { Pedido } from '../models/pedido';
 
 export async function createPedido(exame: Exame, doente: Doente): Promise<Pedido> {
     let pedido: Pedido = new Pedido(exame, doente);
-    await pedido.save();
+    await pedido.save().catch(err => { console.log(err) });
     return pedido;
 }
 
