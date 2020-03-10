@@ -1,5 +1,5 @@
-//import
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
+import { BaseEntity, Entity, PrimaryColumn, PrimaryGeneratedColumn, ManyToMany, ManyToOne } from 'typeorm';
+import { Pedido } from './pedido';
 
 @Entity('Worklist')
 export class Worklist extends BaseEntity {
@@ -7,42 +7,28 @@ export class Worklist extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'id' })
     private id: number;
 
-    @Column({ name: 'numero_pedido', type: 'int' })
-    private numero_pedido: number;
+    @ManyToOne(type => Pedido, { eager: true, cascade: true })
+    private pedido: Pedido;
 
-    @Column({ name: 'numero_consulta', type: 'int' })
-    private numero_consulta: number;
-
-    constructor(numero_pedido: number, numero_consulta: number) {
+    constructor(pedido: Pedido) {
         super();
-        this.numero_pedido = numero_pedido;
-        this.numero_consulta = numero_consulta;
+        this.pedido = pedido;
     }
 
-    //Gets
-    public GetId(): number {
+    public getId(): number {
         return this.id;
     }
 
-    public GetNumero_pedido(): number {
-        return this.numero_pedido;
-    }
-
-    public GetNumero_consulta(): number {
-        return this.numero_consulta;
-    }
-
-    //Sets
-    public SetId(id: number): void {
+    public setId(id: number): void {
         this.id = id;
     }
 
-    public SetNumero_pedido(numero_pedido: number): void {
-        this.numero_pedido = numero_pedido;
+    public getPedido(): Pedido {
+        return this.pedido;
     }
 
-    public SetNumero_consulta(numero_consulta: number): void {
-        this.numero_consulta = numero_consulta;
+    public setPedido(pedido: Pedido): void {
+        this.pedido = pedido;
     }
 
 }

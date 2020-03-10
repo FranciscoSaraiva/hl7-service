@@ -1,20 +1,20 @@
-import { AtoMedico } from '../models/ato_medico';
-import { Doente } from '../models/doente';
+import { createDoente } from '../application/doentes';
+import { createTipoExame } from '../application/tipo_exames';
 
 export async function SeedDatabase(): Promise<boolean> {
-    let consulta_geral = new AtoMedico('Consulta Geral');
-    await consulta_geral.save();
-    let consulta_exames = new AtoMedico('Exames');
-    await consulta_exames.save();
-    let consulta_tratamento = new AtoMedico('Tratamento');
-    await consulta_tratamento.save();
-    let consulta_receitas = new AtoMedico('Receitas');
-    await consulta_receitas.save();
+    //doentes
+    await createDoente('111111111', 'Chico Chico', '911111111');
+    await createDoente('222222222', 'Cesár de Roma', '922222222');
+    await createDoente('333333333', 'Arturito', '933333333');
+    await createDoente('444444444', 'Bruninho Jardão', '944444444');
+    await createDoente('555555555', 'Chico do Vape', '955555555');
+    await createDoente('666666666', 'Dani', '966666666');
 
-    let doente_francisco = new Doente(111222333, 'Lisboa', 911111111);
-    await doente_francisco.save();
-    let doente_cesar = new Doente(111222334, 'Braga', 922222222);
-    await doente_cesar.save();
+    //tipo exames
+    await createTipoExame('RDLG', 'Radiologia');
+    await createTipoExame('EXAM', 'Examinação');
+    await createTipoExame('ENDO', 'Endoscopia');
+    await createTipoExame('BIOP', 'Biopsia');
 
     return true;
 }

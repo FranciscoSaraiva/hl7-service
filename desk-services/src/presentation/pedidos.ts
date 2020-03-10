@@ -8,9 +8,12 @@ import { Pedido } from '../models/pedido';
 import { CreateTable } from './tables';
 import { MainMenuView } from './main_menu';
 import { Doente } from '../models/doente';
-import { AtoMedico } from '../models/ato_medico';
-import { Consulta } from '../models/consulta';
 import { Worklist } from '../models/worklist';
+import { TipoExame } from '../models/tipo_exame';
+import { getDoente } from '../application/doentes';
+import { getTipoExame } from '../application/tipo_exames';
+import { createExame } from '../application/exames';
+import { Exame } from '../models/exame';
 
 
 export async function CriarPedidoView(): Promise<void> {
@@ -18,32 +21,33 @@ export async function CriarPedidoView(): Promise<void> {
     var doentes = await getRepository(Doente).find();
     let doentesList: string[] = [];
     doentes.forEach((doente: Doente) => {
-        doentesList.push(doente.GetNumero_processo().toString());
+        doentesList.push(doente.getNum_utente + ' - ' + doente.getNome().toString());
     });
 
-    var atos = await getRepository(AtoMedico).find();
-    let atosList: string[] = [];
-    atos.forEach((ato: AtoMedico) => {
-        atosList.push(ato.GetAto());
+    var tipos_exames = await getRepository(TipoExame).find();
+    let tipos_examesList: string[] = [];
+    tipos_exames.forEach((tipo: TipoExame) => {
+        tipos_examesList.push(tipo.getDescricao());
     });
 
     inquirer.prompt([
         { type: 'list', name: 'doente', message: 'Qual o doente?', choices: doentesList },
-        { type: 'list', name: 'ato_medico', message: 'Qual o ato médico?', choices: atosList }
+        { type: 'list', name: 'tipo_exame', message: 'Qual o tipo de exame?', choices: tipos_examesList },
+        { type: 'input', name: 'descricao', message: 'Descreva o exame: ', choices: tipos_examesList }
     ]).then(async answer => {
-        let doente_answer = answer.doente;
-        let ato_medico_answer = answer.ato_medico;
+        let doente_answer: string = answer.doente;
+        let tipo_exame_answer: string = answer.tipo_exame;
+        let descricao_answer: string = answer.descricao;
 
-        var consulta = new Consulta();
-        await consulta.save();
+        var doente: Doente = await getDoente(doente_answer);
+        var tipo_exame: TipoExame = await getTipoExame(tipo_exame_answer);
 
-        var doente: Doente = await Doente.findByNumeroProcesso(doente_answer);
-        var ato_medico: AtoMedico = await AtoMedico.findByAto(ato_medico_answer);
+        var exame: Exame = await createExame(descricao_answer, tipo_exame)
 
-        var pedido = new Pedido(consulta, doente, ato_medico);
+        var pedido = new Pedido(exame, doente);
 
         await pedido.save();
-        var worklist: Worklist = new Worklist(pedido.GetNumero_Pedido(), pedido.GetConsulta().GetIdentificador());
+        var worklist: Worklist = new Worklist(pedido);
         await worklist.save();
 
         clear();
@@ -66,25 +70,24 @@ export function VerPedidosView(): void {
 
             for (let index = 0; index < pedidos.length; index++) {
                 const pedido: Pedido = pedidos[index];
-                let consulta: number = pedido.GetConsulta().GetIdentificador();
 
-                let doente: Doente = await getRepository(Doente).findOne({ where: { identificador: pedido.GetDoente().GetIdentificador() } });
-                let doente_proc = doente.GetNumero_processo();
+                let doente: Doente = await getRepository(Doente).findOne({ where: { id: pedido.getDoente().getId() } });
+                let doente_nome: string = doente.getNome();
 
-                let ato_medico: AtoMedico = await getRepository(AtoMedico).findOne({ where: { identificador: pedido.GetAto_Medico().GetIdentificador() } });
-                let ato_medico_ato: string = ato_medico.GetAto();
+                let tipo_exame: TipoExame = await getRepository(TipoExame).findOne({ where: { id: pedido.getExame().getTipo_exame().getId() } });
+                let tipo_exame_ato: string = tipo_exame.getDescricao();
 
-                let num_pedido: number = pedido.GetNumero_Pedido();
-                let data_hora: Date = pedido.GetData_hora();
+                let num_pedido: number = pedido.getId();
+                let data_hora: Date = pedido.getData_hora();
                 let data_hora_formatted: string = `${data_hora.getDate()}-${data_hora.getMonth() + 1}-${data_hora.getFullYear()} ${data_hora.getHours()}:${data_hora.getMinutes()}`;
 
-                let estado = (pedido.GetEstado()) ? 'Realizado' : 'Não Realizado';
+                let estado = (pedido.isEstado()) ? 'Realizado' : 'Não Realizado';
 
-                pedidosRow.push([num_pedido, data_hora_formatted, consulta, doente_proc, ato_medico_ato, estado]);
+                pedidosRow.push([num_pedido, data_hora_formatted, doente_nome, tipo_exame_ato, estado]);
             }
 
             var table = CreateTable(
-                ['Nº Pedido', 'Data e Hora', 'Consulta', 'Doente', 'Ato Médico', 'Estado'],
+                ['Nº Pedido', 'Data e Hora', 'Doente', 'Ato Médico', 'Estado'],
                 pedidosRow);
             console.log(table.toString());
             MainMenuView();

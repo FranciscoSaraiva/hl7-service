@@ -1,64 +1,57 @@
-//import
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import { BaseEntity, Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
 
 @Entity('Doente')
 export class Doente extends BaseEntity {
-  @PrimaryGeneratedColumn({ name: 'identificador' })
-  private identificador: number;
 
-  @Column({ name: 'numero_processo', type: 'int' })
-  private numero_processo: number;
+    @PrimaryGeneratedColumn({ name: 'id' })
+    private id: number;
 
-  @Column({ name: 'morada', type: 'varchar' })
-  private morada: string;
+    @Column({ name: 'num_utente' })
+    private num_utente: string;
 
-  @Column({ name: 'telefone', type: 'int' })
-  private telefone: number;
+    @Column({ name: 'nome' })
+    private nome: string;
 
-  constructor(numero_processo: number, morada: string, telefone: number) {
-    super();
-    this.numero_processo = numero_processo;
-    this.morada = morada;
-    this.telefone = telefone;
-  }
+    @Column({ name: 'telefone' })
+    private telefone: string;
 
-  //Gets
-  public GetIdentificador(): number {
-    return this.identificador;
-  }
+    constructor(num_utente: string, nome: string, telefone: string) {
+        super();
+        this.num_utente = num_utente;
+        this.nome = nome;
+        this.telefone = telefone;
+    }
 
-  public GetNumero_processo(): number {
-    return this.numero_processo;
-  }
+    public getId(): number {
+        return this.id;
+    }
 
-  public GetMorada(): string {
-    return this.morada;
-  }
+    public setId(id: number): void {
+        this.id = id;
+    }
 
-  public GetTelefone(): number {
-    return this.telefone;
-  }
+    public getNum_utente(): string {
+        return this.num_utente;
+    }
 
-  //Sets
-  public SetIdentificador(identificador: number): void {
-    this.identificador = identificador;
-  }
+    public setNum_utente(num_utente: string): void {
+        this.num_utente = num_utente;
+    }
 
-  public SetNumero_processo(numero_processo: number): void {
-    this.numero_processo = numero_processo;
-  }
+    public getNome(): string {
+        return this.nome;
+    }
 
-  public SetMorada(morada: string): void {
-    this.morada = morada;
-  }
+    public setNome(nome: string): void {
+        this.nome = nome;
+    }
 
-  public SetTelefone(telefone: number): void {
-    this.telefone = telefone;
-  }
+    public getTelefone(): string {
+        return this.telefone;
+    }
 
-  static findByNumeroProcesso(numero_processo: number) {
-    return this.createQueryBuilder('doente')
-      .where('doente.numero_processo = :numero_processo', { numero_processo })
-      .getOne();
-  }
+    public setTelefone(telefone: string): void {
+        this.telefone = telefone;
+    }
+
 }
