@@ -15,6 +15,6 @@ export async function getPedidos(): Promise<Pedido[]> {
 }
 
 export async function getPedido(id: number): Promise<Pedido> {
-    let pedido: Pedido = await getRepository(Pedido).findByIds([id])[0];
+    let pedido: Pedido = await getRepository(Pedido).findOne({ where: { id: id } });
     return pedido;
 }

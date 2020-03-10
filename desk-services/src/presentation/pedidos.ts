@@ -23,7 +23,7 @@ export async function CriarPedidoView(): Promise<void> {
     doentes.forEach((doente: Doente) => {
         let num_utente: string = doente.getNum_utente();
         let nome: string = doente.getNome();
-        doentesList.push(`${num_utente} - ${nome}`);
+        doentesList.push(`${num_utente}-${nome}`);
     });
 
     var tipos_exames = await getTipoExames();
@@ -38,7 +38,7 @@ export async function CriarPedidoView(): Promise<void> {
         { type: 'input', name: 'descricao', message: 'Descreva o exame: ', choices: tipos_examesList }
     ])
         .then(async answer => {
-            let doente_answer: string = answer.doente;
+            let doente_answer: string = answer.doente.split('-')[0];
             let tipo_exame_answer: string = answer.tipo_exame;
             let descricao_answer: string = answer.descricao;
 
@@ -71,12 +71,12 @@ export function VerPedidosView(): void {
             var pedidosRow: any[] = [];
 
             for (let index = 0; index < pedidos.length; index++) {
-                const pedido: Pedido = pedidos[index];
+                var pedido: Pedido = pedidos[index];
 
-                let doente: Doente = await getRepository(Doente).findOne({ where: { id: pedido.getDoente().getId() } });
+                let doente: Doente = await getDoente(pedido.getDoente().getNum_utente());
                 let doente_nome: string = doente.getNome();
 
-                let tipo_exame: TipoExame = await getRepository(TipoExame).findOne({ where: { id: pedido.getExame().getTipo_exame().getId() } });
+                let tipo_exame: TipoExame = await getTipoExame(pedido.getExame().getTipo_exame().getDescricao());
                 let tipo_exame_ato: string = tipo_exame.getDescricao();
 
                 let num_pedido: number = pedido.getId();

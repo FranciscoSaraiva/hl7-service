@@ -9,6 +9,6 @@ export async function createExame(descricao: string, tipo_exame: TipoExame): Pro
 }
 
 export async function getExame(exame_id: number): Promise<Exame> {
-    let exame: Exame = await getRepository(Exame).findByIds([exame_id])[0];
+    let exame: Exame = await getRepository(Exame).findOne({ where: { id: exame_id } });
     return exame;
 }

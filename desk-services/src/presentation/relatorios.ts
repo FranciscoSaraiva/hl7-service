@@ -24,7 +24,7 @@ export async function VerRelatorios(): Promise<void> {
         let tipo_exame: string = pedido.getExame().getTipo_exame().getDescricao();
         let exame: string = pedido.getExame().getDescricao();
 
-        pedidos_list.push(`${pedido_id}-${doente_nome}-${doente_num}|${tipo_exame}- ${exame}`);
+        pedidos_list.push(`${pedido_id}-${doente_nome}-${doente_num} | ${tipo_exame} - ${exame}`);
     }
 
     inquirer.prompt([
@@ -34,10 +34,10 @@ export async function VerRelatorios(): Promise<void> {
             clear();
 
             let pedido_id: number = answer.consulta.split('-')[0];
+
             var pedido: Pedido = await getPedido(pedido_id);
 
             let relatorio: string = (pedido.getExame().getRelatorio().length > 0) ? pedido.getExame().getRelatorio() : '(N/A)';
-
             let doente_nome: string = pedido.getDoente().getNome();
             let doente_num: string = pedido.getDoente().getNum_utente();
 
