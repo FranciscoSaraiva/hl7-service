@@ -18,7 +18,8 @@ export class Doente extends BaseEntity {
 
     @Column({
         name: 'genero',
-        type: 'enum'
+        type: 'enum',
+        enum: Genero
     })
     private genero: Genero;
 
