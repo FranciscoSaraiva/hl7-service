@@ -1,4 +1,5 @@
 import { BaseEntity, Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
+import { Genero } from './genero';
 
 @Entity('Doente')
 export class Doente extends BaseEntity {
@@ -15,11 +16,19 @@ export class Doente extends BaseEntity {
     @Column({ name: 'telefone' })
     private telefone: string;
 
-    constructor(num_utente: string, nome: string, telefone: string) {
+    @Column({
+        name: 'genero',
+        type: 'enum',
+        enum: Genero
+    })
+    private genero: Genero;
+
+    constructor(num_utente: string, nome: string, telefone: string, genero: Genero) {
         super();
         this.num_utente = num_utente;
         this.nome = nome;
         this.telefone = telefone;
+        this.genero = genero;
     }
 
     public getId(): number {

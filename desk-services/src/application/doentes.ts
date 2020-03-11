@@ -1,8 +1,9 @@
 import { getRepository } from 'typeorm';
 import { Doente } from '../models/doente';
+import { Genero } from '../models/genero';
 
-export async function createDoente(num_utente: string, nome: string, telefone: string): Promise<Doente> {
-    let doente: Doente = new Doente(num_utente, nome, telefone);
+export async function createDoente(num_utente: string, nome: string, telefone: string, genero: Genero): Promise<Doente> {
+    let doente: Doente = new Doente(num_utente, nome, telefone, genero);
     await doente.save().catch(err => { console.log(err) });
     return doente;
 }
