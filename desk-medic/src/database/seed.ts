@@ -1,11 +1,13 @@
-import { Consulta } from '../models/consulta';
-import { Pedido } from '../models/pedido';
+import { createDoente } from '../application/doentes';
+import { createExame } from '../application/exames';
+import { createPedido } from '../application/pedidos';
+import { Exame } from '../models/exame';
+import { Doente } from '../models/doente';
 
 
 export async function SeedDatabase(): Promise<boolean> {
-    var consulta = new Consulta(1);
-    await consulta.save();
-    var pedido = new Pedido(1, consulta);
-    await pedido.save();
+    let doente: Doente = await createDoente(1, 'Chico', '911111111', '111111111');
+    let exame: Exame = await createExame(1, 'Radiografia ao torax', '', 'Radiologia');
+    await createPedido(1, exame, doente);
     return true;
 }

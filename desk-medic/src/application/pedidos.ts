@@ -1,0 +1,20 @@
+import { getRepository } from 'typeorm';
+import { Pedido } from '../models/pedido';
+import { Exame } from '../models/exame';
+import { Doente } from '../models/doente';
+
+export async function createPedido(id: number, exame: Exame, doente: Doente): Promise<Pedido> {
+    let pedido: Pedido = new Pedido(id, exame, doente);
+    await pedido.save().catch(err => { console.log(err) });
+    return pedido;
+}
+
+export async function getPedidos(): Promise<Pedido[]> {
+    let pedidos: Pedido[] = await getRepository(Pedido).find();
+    return pedidos;
+}
+
+export async function getPedido(num_utente: string): Promise<Pedido> {
+    let pedido: Pedido = await getRepository(Pedido).findOne({ where: { num_utente: num_utente } });
+    return pedido;
+}
