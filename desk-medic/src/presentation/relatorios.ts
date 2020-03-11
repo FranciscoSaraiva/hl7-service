@@ -6,8 +6,8 @@ import inquirer from 'inquirer';
 //local
 import { Pedido } from '../models/pedido';
 import { MainMenuView } from './main_menu';
-import { Consulta } from '../models/consulta';
 import { Worklist } from '../models/worklist';
+import { createWorklist } from '../application/worklists';
 
 export function EmitirRelatorioView(): void {
     clear();
@@ -15,7 +15,7 @@ export function EmitirRelatorioView(): void {
         .then(async (pedidos: Pedido[]) => {
 
             if (pedidos.length == 0) {
-                console.log(chalk.redBright('Não existem pedidos concluídos, então não pode emitir relatórios.'))
+                console.log(chalk.redBright('Não existem exame realizados, então não pode emitir relatórios.'))
                 MainMenuView();
                 return;
             }
@@ -24,26 +24,28 @@ export function EmitirRelatorioView(): void {
 
             for (let index = 0; index < pedidos.length; index++) {
                 var pedido = pedidos[index];
-                pedidos_list.push(pedido.GetNumero_Pedido().toString());
+
+                let pedido_id: number = pedido.getId();
+                let tipo_exame: string = pedido.getExame().getTipo_exame();
+                let doente_utente: string = pedido.getDoente().getNum_utente();
+                let doente_nome: string = pedido.getDoente().getNome();
+
+                pedidos_list.push(`${pedido_id}-[${tipo_exame}] ${doente_utente}-${doente_nome}`);
             }
 
             inquirer.prompt([
-                { type: "list", name: "pedido", message: "Qual o pedido a emitir relatório?", choices: pedidos_list },
+                { type: "list", name: "pedido", message: "Qual o exame a emitir relatório?", choices: pedidos_list },
                 { type: "input", name: "relatorio", message: "Introduza o relatório: " }
             ])
                 .then(answer => {
-                    getRepository(Pedido).findOne({ where: { numero_pedido: answer.pedido } })
+                    let pedido_id: number = answer.pedido.split('-')[0];
+                    getRepository(Pedido).findOne({ where: { id: pedido_id } })
                         .then(async (pedido: Pedido) => {
-                            var consulta: Consulta = pedido.GetConsulta();
                             var relatorio = answer.relatorio;
 
-                            consulta.SetRelatorio(relatorio);
-                            await consulta.save();
-
-                            var worklist = new Worklist(pedido.GetNumero_Pedido(), pedido.GetConsulta().GetIdentificador());
-                            worklist.SetEstado_pedido(true);
-                            worklist.SetRelatorio(relatorio);
-                            await worklist.save();
+                            pedido.getExame().setRelatorio(relatorio);
+                            await pedido.getExame().save();
+                            await createWorklist(pedido);
 
                             clear();
                             console.log(chalk.greenBright('O relatório foi submetido.\n'));
@@ -52,8 +54,6 @@ export function EmitirRelatorioView(): void {
                         .catch(err => { console.log(err); process.exit(0); })
                 })
                 .catch(err => { console.log(err); process.exit(0); })
-
-
         })
         .catch((err) => {
             console.log(err);

@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, PrimaryColumn, PrimaryGeneratedColumn, ManyToMany, ManyToOne } from 'typeorm';
+import { BaseEntity, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Pedido } from './pedido';
 
 @Entity('Worklist')

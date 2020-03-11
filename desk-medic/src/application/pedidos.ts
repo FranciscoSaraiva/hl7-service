@@ -14,7 +14,7 @@ export async function getPedidos(): Promise<Pedido[]> {
     return pedidos;
 }
 
-export async function getPedido(num_utente: string): Promise<Pedido> {
-    let pedido: Pedido = await getRepository(Pedido).findOne({ where: { num_utente: num_utente } });
+export async function getPedido(id: number): Promise<Pedido> {
+    let pedido: Pedido = await getRepository(Pedido).findOne({ where: { id: id } });
     return pedido;
 }

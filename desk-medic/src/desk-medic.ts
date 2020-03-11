@@ -14,7 +14,7 @@ createConnection().then(async connection => {
     clear();
     console.log(connection);
     ConnectedDatabaseView();
-    //await SeedDatabase();
+    await SeedDatabase();
     clear();
     Logo();
     MainMenuView();

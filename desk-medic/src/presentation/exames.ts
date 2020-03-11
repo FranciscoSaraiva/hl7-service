@@ -6,7 +6,8 @@ import inquirer from 'inquirer';
 //local
 import { Pedido } from '../models/pedido';
 import { MainMenuView } from './main_menu';
-import { Worklist } from '../models/worklist';
+import { getPedido } from '../application/pedidos';
+import { createWorklist } from '../application/worklists';
 
 export function RealizarExameView(): void {
     clear();
@@ -23,23 +24,27 @@ export function RealizarExameView(): void {
 
             for (let index = 0; index < pedidos.length; index++) {
                 var pedido = pedidos[index];
-                pedidosList.push(pedido.GetNumero_Pedido().toString());
+                let pedido_id: number = pedido.getId();
+                let doente_utente: string = pedido.getDoente().getNum_utente();
+                let doente_nome: string = pedido.getDoente().getNome();
+                let tipo_exame: string = pedido.getExame().getTipo_exame();
+                let exame_desc: string = pedido.getExame().getDescricao();
+                pedidosList.push(`${pedido_id}-[${doente_utente}-${doente_nome}] | ${tipo_exame} [${exame_desc}]`);
             }
 
             inquirer.prompt([
-                { type: 'list', name: 'pedido', message: 'Qual o pedido a realizar exame?', choices: pedidosList },
+                { type: 'list', name: 'pedido', message: 'Qual o exame a realizar?', choices: pedidosList },
             ]).then(async answer => {
-                let pedido_id = answer.pedido;
-                var pedido: Pedido = await getRepository(Pedido).findOne({ where: { numero_pedido: pedido_id } });
-                pedido.SetEstado(true);
+                let pedido_id = answer.pedido.split('-')[0];
+                var pedido: Pedido = await getPedido(pedido_id);
+                pedido.setEstado(true);
                 await pedido.save();
-
-                var worklist = new Worklist(pedido.GetNumero_Pedido(), pedido.GetConsulta().GetIdentificador());
-                worklist.SetEstado_pedido(true);
-                await worklist.save();
-
+                await createWorklist(pedido);
+                
                 clear();
-                console.log(chalk.greenBright(`Exame realizado ao pedido ${pedido.GetNumero_Pedido()}\n`));
+                let doente_utente: string = pedido.getDoente().getNum_utente();
+                let doente_nome: string = pedido.getDoente().getNome();
+                console.log(chalk.greenBright(`Exame realizado ao doente [${doente_utente}-${doente_nome}]\n`));
                 MainMenuView();
             })
         })

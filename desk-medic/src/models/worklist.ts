@@ -1,10 +1,10 @@
-import { BaseEntity, Entity, PrimaryColumn, ManyToOne } from 'typeorm';
+import { BaseEntity, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Pedido } from './pedido';
 
 @Entity('Worklist')
 export class Worklist extends BaseEntity {
 
-    @PrimaryColumn({ name: 'id' })
+    @PrimaryGeneratedColumn({ name: 'id' })
     private id: number;
 
     @ManyToOne(type => Pedido, { eager: true, cascade: true })

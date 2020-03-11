@@ -14,6 +14,7 @@ import { getDoente, getDoentes } from '../application/doentes';
 import { getTipoExame, getTipoExames } from '../application/tipo_exames';
 import { createExame } from '../application/exames';
 import { Exame } from '../models/exame';
+import { createWorklist } from '../application/worklists';
 
 
 export async function CriarPedidoView(): Promise<void> {
@@ -48,8 +49,7 @@ export async function CriarPedidoView(): Promise<void> {
             var pedido = new Pedido(exame, doente);
             await pedido.save();
 
-            var worklist: Worklist = new Worklist(pedido);
-            await worklist.save();
+            await createWorklist(pedido);
 
             clear();
             MainMenuView();
