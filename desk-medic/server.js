@@ -18,7 +18,7 @@ typeorm.createConnection({
         console.log(connection.getDatabaseName())
 
         app.use(async (req, res, next) => {
-            console.log('******message received*****')
+            console.log('******message received*****\n')
 
             console.log(req.msg.log() + '\n');
 
@@ -53,7 +53,7 @@ function gerarPedido(message) {
 
     let pedido_id = pid.getField(1); //1 - pedido.id
 
-    let doente_id = pid.getField(1); //2 - pedido.doente.id
+    let doente_id = pid.getField(2); //2 - pedido.doente.id
     let doente_nome = pid.getField(5); //5 - pedido.doente.nome
     let doente_genero = pid.getField(8); //8 - pedido.doente.genero
     let doente_telefone = pid.getField(13); //13 - pedido.doente.telefone
@@ -82,7 +82,7 @@ function gerarPedido(message) {
         id: pedido_id,
         doente: doente,
         exame: exame,
-        data_hora: Date.now(),
+        data_hora: new Date(),
         estado: false
     };
 
@@ -91,39 +91,18 @@ function gerarPedido(message) {
 
 async function criarPedido(pedido, connection) {
 
-    var doente = await connection.getRepository('Doente').find({ where: { id: pedido.doente.id } })[0];
+    var doente = await connection.getRepository('Doente').findOne({ where: { num_utente: pedido.doente.num_utente } });
 
-    if (!doente)
-        //create doente
-        doente = await connection
-            .createQueryBuilder()
-            .insert()
-            .into('Doente')
-            .values([{ id: pedido.doente.id, nome: pedido.doente.nome, telefone: pedido.doente.telefone, num_utente: pedido.doente.num_utente, genero: pedido.doente.genero }])
-            .execute();
-    else
-        ///update doente
-        doente = await connection
+    if (doente) {
+        console.log('IT EXISTS!')
+        await connection
             .createQueryBuilder()
             .update('Doente')
             .set({ nome: pedido.doente.nome, telefone: pedido.doente.telefone })
             .where('num_utente = :num_utente', { num_utente: pedido.doente.num_utente })
             .execute();
-
-    //create exame
-    var exame = await connection
-        .createQueryBuilder()
-        .insert()
-        .into('Exame')
-        .values([{ id: pedido.exame.id, descricao: pedido.exame.descricao, relatorio: pedido.exame.relatorio, tipo_exame: pedido.exame.tipo_exame }])
-        .execute();
-
-    //create pedido
-    await connection
-        .createQueryBuilder()
-        .insert()
-        .into('Pedido')
-        .values([{ id: id, exame: { id: exame.id }, doente: { id: doente.id }, estado: false, data_hora: new Date() }])
-        .execute();
+        pedido.doente = doente;
+    }
+    await connection.getRepository('Pedido').save(pedido);
 
 }

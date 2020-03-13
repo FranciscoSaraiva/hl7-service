@@ -27,14 +27,15 @@ export function VerEstadoPedidosView(): void {
                 let num_pedido: number = pedido.getId();
                 let data_hora: Date = pedido.getData_hora();
                 let data_hora_formatted: string = `${data_hora.getDate()}-${data_hora.getMonth() + 1}-${data_hora.getFullYear()} ${data_hora.getHours()}:${data_hora.getMinutes()}`;
+                let doente_nome: string = pedido.getDoente().getNome();
                 let tipo_exame: string = pedido.getExame().getDescricao();
                 let estado: string = (pedido.isEstado()) ? 'Realizado' : 'Não realizado';
 
-                pedidosRow.push([num_pedido, data_hora_formatted, tipo_exame, estado]);
+                pedidosRow.push([num_pedido, data_hora_formatted, doente_nome, tipo_exame, estado]);
             }
 
             var table = CreateTable(
-                ['Nº Pedido', 'Data e Hora', 'Exame', 'Estado'],
+                ['Nº Pedido', 'Data e Hora', 'Doente', 'Exame', 'Estado'],
                 pedidosRow);
             console.log(table.toString());
             MainMenuView();

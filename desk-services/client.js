@@ -27,7 +27,7 @@ typeorm.createConnection({
 
             client.send(mensagem, async (err, ack) => {
                 console.log('confirmada recepção\n');
-                //await connection.createQueryBuilder().delete().from("Worklist").where("id = :id", { id: worklist.id }).execute();
+                await connection.createQueryBuilder().delete().from("Worklist").where("id = :id", { id: worklist.id }).execute();
                 console.log('apagado worklist\n')
                 if (err)
                     console.log(err);
