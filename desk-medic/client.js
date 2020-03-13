@@ -23,41 +23,33 @@ typeorm.createConnection({
                 return;
             }
 
-            console.log(worklist)
-            //read worklist
-            if (worklist.relatorio.length == 0) {
-                //EXAME
-                console.log('enviar exame\n');
+            var pedido = await connection.getRepository('Pedido').findOne({ where: { id: worklist.pedido.id } })
 
-                var mensagem = criarMensagemRealizacaoExame(worklist);
-                client.send(mensagem, async (err, ack) => {
-                    console.log('confirmada recepção\n');
-                    await connection.createQueryBuilder().delete().from("Worklist").where("id = :id", { id: worklist.id }).execute();
-                    console.log('apagado worklist\n')
-                    if (err)
-                        console.log(err);
-                    else {
-                        console.log(ack.log());
-                    }
-                });
-            }
-            else {
-                //RELATORIO
-                console.log('enviar relatorio\n');
-
-                var mensagem = criarMensagemRelatorio(worklist);
-                client.send(mensagem, async (err, ack) => {
-                    console.log('confirmada recepção\n');
-                    await connection.createQueryBuilder().delete().from("Worklist").where("id = :id", { id: worklist.id }).execute();
-                    console.log('apagado worklist\n')
-                    if (err)
-                        console.log(err);
-                    else
-                        console.log(ack.log());
-                });
+            var mensagem;
+            switch (pedido.exame.relatorio.length) {
+                case 0: //EXAME
+                    mensagem = criarMensagemRealizacaoExame(worklist);
+                    client.send(mensagem, async (err, ack) => {
+                        await connection.createQueryBuilder().delete().from("Worklist").where("id = :id", { id: worklist.id }).execute();
+                        if (err)
+                            console.log(err);
+                        else {
+                            console.log(ack.log());
+                        }
+                    });
+                    break;
+                default: //RELATORIO
+                    mensagem = criarMensagemRelatorio(worklist);
+                    client.send(mensagem, async (err, ack) => {
+                        await connection.createQueryBuilder().delete().from("Worklist").where("id = :id", { id: worklist.id }).execute();
+                        if (err)
+                            console.log(err);
+                        else
+                            console.log(ack.log());
+                    });
+                    break;
             }
         }
-
         setInterval(() => {
             runClient();
         }, 8000);
@@ -68,7 +60,7 @@ typeorm.createConnection({
 function criarMensagemRealizacaoExame(work) {
     var pedido = work.pedido;
     var message = createMSH(pedido);
-    message.order_control='SC';
+    message.order_control = 'SC';
     createPID(pedido, message);
     createPV1(pedido, message);
     createORC(pedido, message);
@@ -79,7 +71,7 @@ function criarMensagemRealizacaoExame(work) {
 function criarMensagemRelatorio(work) {
     var pedido = work.pedido;
     var message = createMSH(pedido);
-    message.order_control='RE';
+    message.order_control = 'RE';
     createPID(pedido, message);
     createORC(pedido, message);
     createOBR(pedido, message);
@@ -249,7 +241,6 @@ function createORC(pedido, message) {
     )
 }
 
-
 function createOBR(pedido, message) {
     message.addSegment('OBR',
         pedido.exame.id, //OBR.1 - Set ID - OBR	4	
@@ -295,7 +286,7 @@ function createOBR(pedido, message) {
         '', //OBR.41 - Transport Arranged	30	
         '', //OBR.42 - Escort Required	1	
         '', //OBR.43 - Planned Patient Transport Comment	250	
-        pedido.exame.tipo_exame.descricao, //OBR.44 - Procedure Code	250	
+        pedido.exame.tipo_exame, //OBR.44 - Procedure Code	250	
         '', //OBR.45 - Procedure Code Modifier	250	
         '', //OBR.46 - Placer Supplemental Service Information	250	
         '', //OBR.47 - Filler Supplemental Service Information	250	
@@ -305,12 +296,13 @@ function createOBR(pedido, message) {
 }
 
 function createOBX(pedido, message) {
+    var relatorio = pedido.exame.relatorio.split('\\n');
     message.addSegment('OBX',
         '1', //OBX.1 - Set ID - OBX	4	Sequence
         '', //OBX.2 - Value Type	2	
         '', //OBX.3 - Observation Identifier	250	
         '', //OBX.4 - Observation Sub-ID	20	
-        pedido.relatorio, //OBX.5 - Observation Value	99999 Inf
+        pedido.exame.tipo_exame, //OBX.5 - Observation Value	99999 Inf
         '', //OBX.6  - Units 250
         '', //OBX.7  - References Range 60
         '', //OBX.8  - Abnormal Flags 5 Inf
@@ -331,6 +323,145 @@ function createOBX(pedido, message) {
         'DESK-MEDIC', //OBX.23 - Performing Organization Name 567
         'HOSPITAL', //OBX.24 - Performing Organization Address 631
         'JOHN DOE MD', //OBX.25 - Performing Organization Medical Director 3002
-
-    )
+    );
+    message.addSegment('OBX',
+        '2', //OBX.1 - Set ID - OBX	4	Sequence
+        '', //OBX.2 - Value Type	2	
+        '', //OBX.3 - Observation Identifier	250	
+        '', //OBX.4 - Observation Sub-ID	20	
+        '', //OBX.5 - Observation Value	99999 Inf
+        '', //OBX.6  - Units 250
+        '', //OBX.7  - References Range 60
+        '', //OBX.8  - Abnormal Flags 5 Inf
+        '', //OBX.9  - Probability 5
+        '', //OBX.10 - Nature of Abnormal Test 2 Inf
+        '', //OBX.11 - Observation Result Status 1
+        '', //OBX.12 - Effective Date of Reference Range 26
+        '', //OBX.13 - User Defined Access Checks 20
+        '', //OBX.14 - Date/Time of the Observation 26
+        '', //OBX.15 - Producer's ID 250
+        '', //OBX.16 - Responsible Observer 250 Inf
+        '', //OBX.17 - Observation Method 250 Inf
+        '', //OBX.18 - Equipment Instance Identifier 22 Inf
+        Date.now(), //OBX.19 - Date/Time of the Analysis 26
+        '', //OBX.20 - Reserved for harmonization with V2.6 0
+        '', //OBX.21 - Reserved for harmonization with V2.6 0
+        '', //OBX.22 - Reserved for harmonization with V2.6 0
+        'DESK-MEDIC', //OBX.23 - Performing Organization Name 567
+        'HOSPITAL', //OBX.24 - Performing Organization Address 631
+        'JOHN DOE MD', //OBX.25 - Performing Organization Medical Director 3002
+    );
+    message.addSegment('OBX',
+        '3', //OBX.1 - Set ID - OBX	4	Sequence
+        '', //OBX.2 - Value Type	2	
+        '', //OBX.3 - Observation Identifier	250	
+        '', //OBX.4 - Observation Sub-ID	20	
+        '', //OBX.5 - Observation Value	99999 Inf
+        '', //OBX.6  - Units 250
+        '', //OBX.7  - References Range 60
+        '', //OBX.8  - Abnormal Flags 5 Inf
+        '', //OBX.9  - Probability 5
+        '', //OBX.10 - Nature of Abnormal Test 2 Inf
+        '', //OBX.11 - Observation Result Status 1
+        '', //OBX.12 - Effective Date of Reference Range 26
+        '', //OBX.13 - User Defined Access Checks 20
+        '', //OBX.14 - Date/Time of the Observation 26
+        '', //OBX.15 - Producer's ID 250
+        '', //OBX.16 - Responsible Observer 250 Inf
+        '', //OBX.17 - Observation Method 250 Inf
+        '', //OBX.18 - Equipment Instance Identifier 22 Inf
+        Date.now(), //OBX.19 - Date/Time of the Analysis 26
+        '', //OBX.20 - Reserved for harmonization with V2.6 0
+        '', //OBX.21 - Reserved for harmonization with V2.6 0
+        '', //OBX.22 - Reserved for harmonization with V2.6 0
+        'DESK-MEDIC', //OBX.23 - Performing Organization Name 567
+        'HOSPITAL', //OBX.24 - Performing Organization Address 631
+        'JOHN DOE MD', //OBX.25 - Performing Organization Medical Director 3002
+    );
+    message.addSegment('OBX',
+        '4', //OBX.1 - Set ID - OBX	4	Sequence
+        '', //OBX.2 - Value Type	2	
+        '', //OBX.3 - Observation Identifier	250	
+        '', //OBX.4 - Observation Sub-ID	20	
+        'RELATÓRIO:', //OBX.5 - Observation Value	99999 Inf
+        '', //OBX.6  - Units 250
+        '', //OBX.7  - References Range 60
+        '', //OBX.8  - Abnormal Flags 5 Inf
+        '', //OBX.9  - Probability 5
+        '', //OBX.10 - Nature of Abnormal Test 2 Inf
+        '', //OBX.11 - Observation Result Status 1
+        '', //OBX.12 - Effective Date of Reference Range 26
+        '', //OBX.13 - User Defined Access Checks 20
+        '', //OBX.14 - Date/Time of the Observation 26
+        '', //OBX.15 - Producer's ID 250
+        '', //OBX.16 - Responsible Observer 250 Inf
+        '', //OBX.17 - Observation Method 250 Inf
+        '', //OBX.18 - Equipment Instance Identifier 22 Inf
+        Date.now(), //OBX.19 - Date/Time of the Analysis 26
+        '', //OBX.20 - Reserved for harmonization with V2.6 0
+        '', //OBX.21 - Reserved for harmonization with V2.6 0
+        '', //OBX.22 - Reserved for harmonization with V2.6 0
+        'DESK-MEDIC', //OBX.23 - Performing Organization Name 567
+        'HOSPITAL', //OBX.24 - Performing Organization Address 631
+        'JOHN DOE MD', //OBX.25 - Performing Organization Medical Director 3002
+    );
+    message.addSegment('OBX',
+        '5', //OBX.1 - Set ID - OBX	4	Sequence
+        '', //OBX.2 - Value Type	2	
+        '', //OBX.3 - Observation Identifier	250	
+        '', //OBX.4 - Observation Sub-ID	20	
+        '', //OBX.5 - Observation Value	99999 Inf
+        '', //OBX.6  - Units 250
+        '', //OBX.7  - References Range 60
+        '', //OBX.8  - Abnormal Flags 5 Inf
+        '', //OBX.9  - Probability 5
+        '', //OBX.10 - Nature of Abnormal Test 2 Inf
+        '', //OBX.11 - Observation Result Status 1
+        '', //OBX.12 - Effective Date of Reference Range 26
+        '', //OBX.13 - User Defined Access Checks 20
+        '', //OBX.14 - Date/Time of the Observation 26
+        '', //OBX.15 - Producer's ID 250
+        '', //OBX.16 - Responsible Observer 250 Inf
+        '', //OBX.17 - Observation Method 250 Inf
+        '', //OBX.18 - Equipment Instance Identifier 22 Inf
+        Date.now(), //OBX.19 - Date/Time of the Analysis 26
+        '', //OBX.20 - Reserved for harmonization with V2.6 0
+        '', //OBX.21 - Reserved for harmonization with V2.6 0
+        '', //OBX.22 - Reserved for harmonization with V2.6 0
+        'DESK-MEDIC', //OBX.23 - Performing Organization Name 567
+        'HOSPITAL', //OBX.24 - Performing Organization Address 631
+        'JOHN DOE MD', //OBX.25 - Performing Organization Medical Director 3002
+    );
+    var set_id = 5;
+    for (let index = 0; index < relatorio.length; index++) {
+        var linha = relatorio[index];
+        set_id += 1;
+        message.addSegment('OBX',
+            set_id, //OBX.1 - Set ID - OBX	4	Sequence
+            '', //OBX.2 - Value Type	2	
+            '', //OBX.3 - Observation Identifier	250	
+            '', //OBX.4 - Observation Sub-ID	20	
+            linha, //OBX.5 - Observation Value	99999 Inf
+            '', //OBX.6  - Units 250
+            '', //OBX.7  - References Range 60
+            '', //OBX.8  - Abnormal Flags 5 Inf
+            '', //OBX.9  - Probability 5
+            '', //OBX.10 - Nature of Abnormal Test 2 Inf
+            '', //OBX.11 - Observation Result Status 1
+            '', //OBX.12 - Effective Date of Reference Range 26
+            '', //OBX.13 - User Defined Access Checks 20
+            '', //OBX.14 - Date/Time of the Observation 26
+            '', //OBX.15 - Producer's ID 250
+            '', //OBX.16 - Responsible Observer 250 Inf
+            '', //OBX.17 - Observation Method 250 Inf
+            '', //OBX.18 - Equipment Instance Identifier 22 Inf
+            Date.now(), //OBX.19 - Date/Time of the Analysis 26
+            '', //OBX.20 - Reserved for harmonization with V2.6 0
+            '', //OBX.21 - Reserved for harmonization with V2.6 0
+            '', //OBX.22 - Reserved for harmonization with V2.6 0
+            'DESK-MEDIC', //OBX.23 - Performing Organization Name 567
+            'HOSPITAL', //OBX.24 - Performing Organization Address 631
+            'JOHN DOE MD', //OBX.25 - Performing Organization Medical Director 3002
+        );
+    }
 }

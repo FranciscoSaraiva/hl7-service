@@ -17,29 +17,29 @@ typeorm.createConnection({
         console.log('connected')
         console.log(connection.getDatabaseName())
 
-        app.use((req, res, next) => {
-            console.log('******message received*****')
+        app.use(async (req, res, next) => {
+            console.log('******message received*****\n')
 
             console.log(req.msg.log() + '\n');
 
-            var orc = req.msg.getSegment('ORC').getField(1);
+            var type = (req.msg.getSegment('OBX')) ? 'RELATORIO' : 'EXAME';
 
-            switch (orc) {
+            switch (type) {
                 case 'EXAME':
-                    console.log('recebi um exame\n')
-
-                    var numero_pedido = req.msg.getSegment('PID').getField(1);
-                    var estado = req.msg.getSegment('OBR').getField(1);
-                    atualizarExame(numero_pedido, estado, connection);
-
+                    var pedido_id = req.msg.getSegment('PID').getField(1);
+                    atualizarExame(pedido_id, connection);
                     break;
                 case 'RELATORIO':
-                    console.log('recebi um relatorio\n')
-
-                    var numero_consulta = req.msg.getSegment('PID').getField(1);
-                    var relatorio = req.msg.getSegment('OBX').getField(1);
-                    atualizarRelatorio(numero_consulta, relatorio, connection);
-
+                    var exame_id = req.msg.getSegment('OBR').getField(1);
+                    var obx_segments = req.msg.getSegments('OBX');
+                    var relatorio = '';
+                    for (let index = 0; index < obx_segments.length; index++) {
+                        var set_id = obx_segments[index].getField(1);
+                        if (set_id >= 6) {
+                            relatorio += obx_segments[index].getField(5).trim() + '\n';
+                        }
+                    }
+                    atualizarRelatorio(exame_id, relatorio, connection);
                     break;
             }
 
@@ -65,20 +65,30 @@ typeorm.createConnection({
     .catch(err => { console.log(err) })
 
 
-async function atualizarExame(numero_pedido, estado, connection) {
+
+function gerarPedidoExame() {
+    //OBR
+}
+
+function gerarPedidoRelatorio() {
+    //TX
+}
+
+
+async function atualizarExame(id, connection) {
     await connection
         .createQueryBuilder()
         .update('Pedido')
-        .set({ estado: estado })
-        .where("numero_pedido = :id", { id: numero_pedido })
+        .set({ estado: true })
+        .where("id = :id", { id: id })
         .execute();
 }
 
-async function atualizarRelatorio(numero_consulta, relatorio, connection) {
+async function atualizarRelatorio(id, relatorio, connection) {
     await connection
         .createQueryBuilder()
-        .update('Consulta')
+        .update('Exame')
         .set({ relatorio: relatorio })
-        .where("identificador = :id", { id: numero_consulta })
+        .where("id = :id", { id: id })
         .execute();
 }
