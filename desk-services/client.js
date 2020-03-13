@@ -261,7 +261,7 @@ function createOBR(pedido, message) {
         '', //OBR.41 - Transport Arranged	30	
         '', //OBR.42 - Escort Required	1	
         '', //OBR.43 - Planned Patient Transport Comment	250	
-        pedido.exame.tipo_exame.sigla, //OBR.44 - Procedure Code	250	
+        pedido.exame.tipo_exame.descricao, //OBR.44 - Procedure Code	250	
         '', //OBR.45 - Procedure Code Modifier	250	
         '', //OBR.46 - Placer Supplemental Service Information	250	
         '', //OBR.47 - Filler Supplemental Service Information	250	

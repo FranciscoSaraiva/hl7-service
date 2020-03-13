@@ -17,14 +17,13 @@ typeorm.createConnection({
         console.log('connected')
         console.log(connection.getDatabaseName())
 
-        app.use((req, res, next) => {
+        app.use(async (req, res, next) => {
             console.log('******message received*****')
 
             console.log(req.msg.log() + '\n');
 
-            var numero_pedido = req.msg.getSegment('PID').getField(1);
-            var numero_consulta = req.msg.getSegment('PID').getField(2);
-            criarPedido(numero_pedido, numero_consulta, connection);
+            var pedido = await gerarPedido(req.msg);
+            criarPedido(pedido, connection);
 
             next();
         })
@@ -48,20 +47,83 @@ typeorm.createConnection({
     .catch(err => { console.log(err) })
 
 
-async function criarPedido(numero_pedido, numero_consulta, connection) {
-    console.log(numero_consulta)
-    await connection
+function gerarPedido(message) {
+    //PID
+    var pid = message.getSegment('PID');
+
+    let pedido_id = pid.getField(1); //1 - pedido.id
+
+    let doente_id = pid.getField(1); //2 - pedido.doente.id
+    let doente_nome = pid.getField(5); //5 - pedido.doente.nome
+    let doente_genero = pid.getField(8); //8 - pedido.doente.genero
+    let doente_telefone = pid.getField(13); //13 - pedido.doente.telefone
+    let doente_num_utente = pid.getField(18); //18 - pedido.doente.num_utente
+
+    //OBR
+    var obr = message.getSegment('OBR');
+    let exame_id = obr.getField(1); //1 - pedido.exame.id
+    let exame_descricao = obr.getField(13); //13 - pedido.exame.descricao
+    let exame_tipo_descricao = obr.getField(44); //44 - pedido.exame.tipo_exame.descricao
+
+    var doente = {
+        id: doente_id,
+        nome: doente_nome,
+        genero: doente_genero,
+        telefone: doente_telefone,
+        num_utente: doente_num_utente
+    };
+    var exame = {
+        id: exame_id,
+        descricao: exame_descricao,
+        relatorio: '',
+        tipo_exame: exame_tipo_descricao
+    };
+    var pedido = {
+        id: pedido_id,
+        doente: doente,
+        exame: exame,
+        data_hora: Date.now(),
+        estado: false
+    };
+
+    return pedido;
+}
+
+async function criarPedido(pedido, connection) {
+
+    var doente = await connection.getRepository('Doente').find({ where: { id: pedido.doente.id } })[0];
+
+    if (!doente)
+        //create doente
+        doente = await connection
+            .createQueryBuilder()
+            .insert()
+            .into('Doente')
+            .values([{ id: pedido.doente.id, nome: pedido.doente.nome, telefone: pedido.doente.telefone, num_utente: pedido.doente.num_utente, genero: pedido.doente.genero }])
+            .execute();
+    else
+        ///update doente
+        doente = await connection
+            .createQueryBuilder()
+            .update('Doente')
+            .set({ nome: pedido.doente.nome, telefone: pedido.doente.telefone })
+            .where('num_utente = :num_utente', { num_utente: pedido.doente.num_utente })
+            .execute();
+
+    //create exame
+    var exame = await connection
         .createQueryBuilder()
         .insert()
-        .into('Consulta')
-        .values([{ identificador: numero_consulta, relatorio: '' }])
+        .into('Exame')
+        .values([{ id: pedido.exame.id, descricao: pedido.exame.descricao, relatorio: pedido.exame.relatorio, tipo_exame: pedido.exame.tipo_exame }])
         .execute();
 
+    //create pedido
     await connection
         .createQueryBuilder()
         .insert()
         .into('Pedido')
-        .values([{ numero_pedido: numero_pedido, consulta: { identificador: numero_consulta }, estado: false, data_hora: new Date() }])
+        .values([{ id: id, exame: { id: exame.id }, doente: { id: doente.id }, estado: false, data_hora: new Date() }])
         .execute();
 
 }
