@@ -68,13 +68,25 @@ typeorm.createConnection({
 function criarMensagemRealizacaoExame(work) {
     var pedido = work.pedido;
     var message = createMSH(pedido);
+    message.order_control='SC';
     createPID(pedido, message);
     createPV1(pedido, message);
     createORC(pedido, message);
     createOBR(pedido, message);
     return message;
-
 }
+
+function criarMensagemRelatorio(work) {
+    var pedido = work.pedido;
+    var message = createMSH(pedido);
+    message.order_control='RE';
+    createPID(pedido, message);
+    createORC(pedido, message);
+    createOBR(pedido, message);
+    createOBX(pedido, message);
+    return message;
+}
+
 
 function createMSH(pedido) {
     return new hl7.Message( //'^~\&', //MSH.1 - Field Separator	1 [DEFAULT]
@@ -204,7 +216,7 @@ function createPV1(pedido, message) {
 
 function createORC(pedido, message) {
     message.addSegment('ORC',
-        'SC', //ORC.1 - Order Control	2	
+        message.order_control, //ORC.1 - Order Control	2	
         '4727375', //ORC.2 - Placer Order Number	22	
         '4727375', //ORC.3 - Filler Order Number	22	
         '', //ORC.4 - Placer Group Number	22	
@@ -292,16 +304,33 @@ function createOBR(pedido, message) {
     )
 }
 
+function createOBX(pedido, message) {
+    message.addSegment('OBX',
+        '1', //OBX.1 - Set ID - OBX	4	Sequence
+        '', //OBX.2 - Value Type	2	
+        '', //OBX.3 - Observation Identifier	250	
+        '', //OBX.4 - Observation Sub-ID	20	
+        pedido.relatorio, //OBX.5 - Observation Value	99999 Inf
+        '', //OBX.6  - Units 250
+        '', //OBX.7  - References Range 60
+        '', //OBX.8  - Abnormal Flags 5 Inf
+        '', //OBX.9  - Probability 5
+        '', //OBX.10 - Nature of Abnormal Test 2 Inf
+        '', //OBX.11 - Observation Result Status 1
+        '', //OBX.12 - Effective Date of Reference Range 26
+        '', //OBX.13 - User Defined Access Checks 20
+        '', //OBX.14 - Date/Time of the Observation 26
+        '', //OBX.15 - Producer's ID 250
+        '', //OBX.16 - Responsible Observer 250 Inf
+        '', //OBX.17 - Observation Method 250 Inf
+        '', //OBX.18 - Equipment Instance Identifier 22 Inf
+        Date.now(), //OBX.19 - Date/Time of the Analysis 26
+        '', //OBX.20 - Reserved for harmonization with V2.6 0
+        '', //OBX.21 - Reserved for harmonization with V2.6 0
+        '', //OBX.22 - Reserved for harmonization with V2.6 0
+        'DESK-MEDIC', //OBX.23 - Performing Organization Name 567
+        'HOSPITAL', //OBX.24 - Performing Organization Address 631
+        'JOHN DOE MD', //OBX.25 - Performing Organization Medical Director 3002
 
-function criarMensagemRelatorio(work) {
-    var message = new hl7.Message();
-
-    //PID (identificacao consulta)
-    message.addSegment('PID', work.numero_consulta)
-    //ORC (que tipo de mensagem)
-    message.addSegment('ORC', 'RELATORIO')
-    //OBX (relatório)
-    message.addSegment('OBX', work.relatorio)
-
-    return message;
+    )
 }
